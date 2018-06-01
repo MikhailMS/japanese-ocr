@@ -1,0 +1,9 @@
+[global]
+floatX = float32
+device = cpu
+
+[lib]
+cnmem = 1
+
+[nvcc]
+flags=-D_FORCE_INLINES

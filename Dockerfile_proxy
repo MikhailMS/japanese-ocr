@@ -1,0 +1,47 @@
+FROM continuumio/miniconda3
+
+ENV HTTP_PROXY "http://proxy.intra.bt.com:8080"
+ENV HTTPS_PROXY "http://proxy.intra.bt.com:8080"
+
+# Install system packages
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      bzip2 \
+      g++ \
+      git \
+      graphviz \
+      libgl1-mesa-glx \
+      libhdf5-dev \
+      openmpi-bin \
+      wget && \
+    rm -rf /var/lib/apt/lists/*
+
+# Install Python packages and keras
+RUN pip install --upgrade pip && \
+    pip install \
+      sklearn_pandas \
+      tensorflow && \
+    conda install \
+      bcolz \
+      h5py \
+      matplotlib \
+      mkl \
+      nose \
+      notebook \
+      Pillow \
+      pandas \
+      pyyaml \
+      scikit-learn \
+      six \
+      theano && \
+    git clone git://github.com/keras-team/keras.git /src && pip install -e /src[tests] && \
+    pip install git+git://github.com/keras-team/keras.git && \
+    conda clean -yt
+
+ADD theanorc ~/.theanorc
+ADD keras.json ~/.keras/keras.json
+
+ENV PYTHONPATH='/src/:$PYTHONPATH'
+
+EXPOSE 8888
+
+CMD jupyter notebook --port=8888 --ip=0.0.0.0
